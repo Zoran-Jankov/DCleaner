@@ -35,6 +35,9 @@ $videoExtensions = "*.WEBM", "*.MPG", "*.MP2", "*.MPEG", "*.MPE", "*.MPV", "*.OG
 
 #----------------------------------------------------------[Declarations]----------------------------------------------------------
 
+#Timestamp
+$timestamp = Get-Date -Format "dd.MM/yyyy HH:mm:ss"
+
 #Default Paths
 $defaultTargetFolder = ################################################################env:USERPROFILE
 $defaultPicturesFolder = [environment]::getfolderpath("mypictures")
@@ -71,29 +74,31 @@ Function Create-Item
     }
 }
 
+Function Get-Timestamp
+{
+    $timestamp = Get-Date -Format "yyyy.MM.dd. HH:mm:ss"
+}
+
 Function Move-Files
 {
     param($extensions, $destination)
 
+    $logEntry = $timestamp + " - File sorting started"
+
+    Log-Write -LogPath $logFile -LineValue $logEntry
+
     foreach($extension in $extensions)
     {
-        Begin
-        {
-            $logEntry = "File sorting started - " + Get-Date -Format "dd.MM/yyyy HH:mm:ss"
 
-            Log-Write -LogPath $logFile -LineValue $logEntry
-        }
+        $path = $sorce + $extension
 
-            $path = $sorce + $extension
+        $file = Get-ChildItem -Path $path
 
-            $file = Get-ChildItem -Path $path
+        Move-Item -Path $file -Destination $destination
 
-            Move-Item -Path $file -Destination $destination
+        $logEntry = $file.Name + " moved to " + $destination
 
-            $logEntry = $file.Name + " moved to " + $destination
-
-            Log-Write -LogPath $logFile -LineValue $logEntry
-
+        Log-Write -LogPath $logFile -LineValue $logEntry
     }
 }
 
