@@ -2,12 +2,12 @@
 .NAME
     Downloaded Files Sorter
 .SYNOPSIS
-  Moves files from a target folder to Videos, Pictures, Documents and Program Installers folders based on file extensions.
+  Moves files from a source folder to Videos, Pictures, Documents and Program Installers folders based on file extensions.
 .DESCRIPTION
-  In the target folder all files are checked and moved to Videos, Pictures, Documents and Program Installers folders based on file 
-  extensions. Paths to target folder and to user libraries can be defined by the user, and saved permanently to local computer, but
-  there are default values for those paths. File sorting is not performed in subfolders of the target folder and they are not moved
-  by the script.
+  In the source folder all files are checked and moved to Videos, Pictures, Documents and Program Installers folders based on file 
+  extensions. Paths to source folder and to user libraries can be defined by the user, and can besaved permanently to local 
+  computer, butthere are default values for those paths. File sorting is not performed in subfolders of the target folder and they 
+  are not moved by the script.
 .INPUTS
   Path to target, Videos, Documents, Pictures and Program Installers folders can by the user, and there are tree buttons:
   Default Locations - restores default paths for all folders.
@@ -28,25 +28,25 @@
 $ErrorActionPreference = "SilentlyContinue"
 
 #Set known extensions
-$documentExtensions = "*.DOC", "*.DOCX", "*.HTML", "*.HTM", "*.ODT", "*.PDF", "*.XLS", "*.XLSX", "*.ODS", "*.PPT", "*.PPTX", "*.TXT"
+$documentExtensions = "*.DOC", "*.DOCX", "*.HTML", "*.HTM", "*.ODT", "*.PDF", "*.XLS", "*.XLSX", "*.ODS", "*.PPT", "*.PPTX", "*.TXT", "*.LOG"
 $installerExtensions = "*.exe", "*.msi", "*.msm", "*.msp", "*.mst", "*.idt", "*.idt", "*.cub", "*.pcp"
 $pictureExtensions = "*.JPG", "*.PNG", "*.GIF", "*.WEBP", "*.TIFF", "*.SD", "*.RAW", "*.BMP", "*.HEIF", "*.INDD", "*.JPEG", "*.SVG", "*.AI", "*.EPS", "*.PDF"
 $videoExtensions = "*.WEBM", "*.MPG", "*.MP2", "*.MPEG", "*.MPE", "*.MPV", "*.OGG", "*.MP4", "*.M4P", "*.M4V", "*.AVI", "*.WMV", "*.MO", "*.QT", "*.FLV", "*.SWF", "*.AVCHD"
 
 #----------------------------------------------------------[Declarations]----------------------------------------------------------
 
-#Timestamp
+#Timestamp Definition
 $timestamp = Get-Date -Format "dd.MM/yyyy HH:mm:ss"
 
 #Default Paths
-$defaultTargetFolder = ################################################################env:USERPROFILE
+$defaultSourceFolder = ################################################################env:USERPROFILE
 $defaultPicturesFolder = [environment]::getfolderpath("mypictures")
 $defaultProgramInstallersFolder = "D:\Program Installers\"
 $defaultDocumentsFolder = [environment]::getfolderpath("mydocuments")
 $defaultVideosFolder = [environment]::getfolderpath("myvideos")
 
 #Current Paths
-$targetFolder = $defaultTargetFolder
+$sourceFolder = $defaultTargetFolder
 $picturesFolder = $defaultPicturesFolder
 $programInstallersFolder = $defaultProgramInstallersFolder 
 $documentsFolder = $defaultDocumentsFolder
@@ -64,7 +64,9 @@ $costumFoldersName = "Costum-Folders.cvs"
 $costumFoldersFile = Join-Path -Path $appPath -ChildPath $costumFoldersName 
 
 #-----------------------------------------------------------[Functions]------------------------------------------------------------
-Function Create-Item
+
+#Creates necessary files and directory in %APPDATA% directory
+Function New-ItemConditionalCreation
 {
     param($Item, $Type)
 
@@ -74,67 +76,68 @@ Function Create-Item
     }
 }
 
+#Refreshes formatted timestamp variable - $timestamp
 Function Get-Timestamp
 {
     $timestamp = Get-Date -Format "yyyy.MM.dd. HH:mm:ss"
 }
 
+#Moves files with defined extensions from source folder to defined destination folder
 Function Move-Files
 {
     param($Extensions, $Destination)
 
-    $logEntry = $timestamp + " - File moving files to " + $Destination
+    Get-Timestamp
+
+    $logEntry = $timestamp + " - Started moving files to " + $Destination
 
     Log-Write -LogPath $logFile -LineValue $logEntry
 
-    foreach($extension in $Extensions)
+    Try
     {
-        $path = $sorce + $extension
+        foreach($extension in $Extensions)
+        {
+            $path = $sourceFolder + $extension
 
-        $file = Get-ChildItem -Path $path
+            $file = Get-ChildItem -Path $path
 
-        Move-Item -Path $file -Destination $Destination
+            Move-Item -Path $file -Destination $Destination
 
-        $logEntry = $file.Name + " moved to " + $Destination
+            Get-Timestamp
 
-        Log-Write -LogPath $logFile -LineValue $logEntry
+            $logEntry = $timestamp + " - " + $file.Name + " moved to " + $Destination
+
+            Log-Write -LogPath $logFile -LineValue $logEntry
+        }
+    }
+
+    Catch
+    {
+        Log-Error -LogPath $logFile -ErrorDesc $_.Exception -ExitGracefully $True
+        Break
     }
 }
 
-Function Initialize-FileSorting
+#Starts files moving from source to user library folders
+Function Start-FileSorting
 {
-    Begin
-    {
-        Get-Timestamp
+    Get-Timestamp
 
-        $logEntry = $timestamp + " - File sorting started"
+    $logEntry = $timestamp + " - File sorting started"
 
-        Log-Write -LogPath $logFile -LineValue $logEntry
-    }
-  
-    Process
-    {
-        Try
-        {
-            Move-Files -Extensions $documentExtensions -Destination $documentsFolder
-            Move-Files -Extensions $pictureExtensions -Destination $picturesFolder
-            Move-Files -Extensions $videoExtensions -Destination $videosFolder
-            Move-Files -Extensions $installerExtensions -Destination $documentsFolder
-        }
-    
-        Catch
-        {
-            Log-Error -LogPath $sLogFile -ErrorDesc $_.Exception -ExitGracefully $True
-            Break
-        }
-    }
-  
+    Log-Write -LogPath $logFile -LineValue $logEntry
+   
+    Move-Files -Extensions $documentExtensions -Destination $documentsFolder
+    Move-Files -Extensions $pictureExtensions -Destination $picturesFolder
+    Move-Files -Extensions $videoExtensions -Destination $videosFolder
+    Move-Files -Extensions $installerExtensions -Destination $programInstallersFolder
+
     End
     {
         If($true)
         {
-            Log-Write -LogPath $sLogFile -LineValue "Completed Successfully."
-            Log-Write -LogPath $sLogFile -LineValue "================================================================================================="
+            Log-Write -LogPath $logFile -LineValue "Completed Successfully."
+            Log-Write -LogPath $logFile -LineValue "============================================================================="
         }
     }
 }
@@ -142,7 +145,8 @@ Function Initialize-FileSorting
 #-----------------------------------------------------------[Execution]------------------------------------------------------------
 
 Create-Item -Item $appPath -Type Directory
-Create-Item -Item $$logFile -Type File
+Create-Item -Item $logFile -Type File
+
 Create-Item -Item $costumFoldersFile -Type file
 
 Log-Finish -LogPath $logFile
