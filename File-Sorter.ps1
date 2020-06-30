@@ -66,11 +66,11 @@ $costumFoldersFile = Join-Path -Path $appPath -ChildPath $costumFoldersName
 #-----------------------------------------------------------[Functions]------------------------------------------------------------
 Function Create-Item
 {
-    param($item, $type)
+    param($Item, $Type)
 
-    if((Test-Path $item) -eq $False)
+    if((Test-Path $Item) -eq $False)
     {
-        New-Item -Path $item -ItemType $type
+        New-Item -Path $Item -ItemType $Type
     }
 }
 
@@ -81,32 +81,33 @@ Function Get-Timestamp
 
 Function Move-Files
 {
-    param($extensions, $destination)
+    param($Extensions, $Destination)
 
-    $logEntry = $timestamp + " - File sorting started"
+    $logEntry = $timestamp + " - File moving files to " + $Destination
 
     Log-Write -LogPath $logFile -LineValue $logEntry
 
-    foreach($extension in $extensions)
+    foreach($extension in $Extensions)
     {
-
         $path = $sorce + $extension
 
         $file = Get-ChildItem -Path $path
 
-        Move-Item -Path $file -Destination $destination
+        Move-Item -Path $file -Destination $Destination
 
-        $logEntry = $file.Name + " moved to " + $destination
+        $logEntry = $file.Name + " moved to " + $Destination
 
         Log-Write -LogPath $logFile -LineValue $logEntry
     }
 }
 
-Function Sort-Files
+Function Initialize-FileSorting
 {
     Begin
     {
-        $logEntry = "File sorting started - " + Get-Date -Format h
+        Get-Timestamp
+
+        $logEntry = $timestamp + " - File sorting started"
 
         Log-Write -LogPath $logFile -LineValue $logEntry
     }
