@@ -42,7 +42,7 @@ $defaultProgramInstallersFolder = "D:\Program Installers\"
 $defaultDocumentsFolder = [environment]::getfolderpath("mydocuments")
 $defaultVideosFolder = [environment]::getfolderpath("myvideos")
 
-#Curent Paths
+#Current Paths
 $targetFolder = $defaultTargetFolder
 $picturesFolder = $defaultPicturesFolder
 $programInstallersFolder = $defaultProgramInstallersFolder 
