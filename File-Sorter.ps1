@@ -39,7 +39,7 @@ $videoExtensions = "*.WEBM", "*.MPG", "*.MP2", "*.MPEG", "*.MPE", "*.MPV", "*.OG
 $timestamp = Get-Date -Format "dd.MM/yyyy HH:mm:ss"
 
 #Default Paths
-$defaultSourceFolder = ################################################################env:USERPROFILE
+$defaultSourceFolder = (New-Object -ComObject Shell.Application).NameSpace('shell:Downloads').Self.Path
 $defaultPicturesFolder = [environment]::getfolderpath("mypictures")
 $defaultProgramInstallersFolder = "D:\Program Installers\"
 $defaultDocumentsFolder = [environment]::getfolderpath("mydocuments")
@@ -137,7 +137,7 @@ Function Start-FileSorting
         If($true)
         {
             Log-Write -LogPath $logFile -LineValue "Completed Successfully."
-            Log-Write -LogPath $logFile -LineValue "============================================================================="
+            Log-Write -LogPath $logFile -LineValue "=============================================================================="
         }
     }
 }
