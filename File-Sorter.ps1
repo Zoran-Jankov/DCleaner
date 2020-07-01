@@ -16,7 +16,7 @@
 .OUTPUTS
   Log file stored in "%APPDATA%\File-Sorter\File-Sorter-Log.log"
 .NOTES
-  Version:        0.8
+  Version:        0.9
   Author:         Zoran Jankov
   Creation Date:  30.06.2020.
   Purpose/Change: Initial script development
@@ -146,6 +146,13 @@ $btnSaveLocations.height         = 30
 $btnSaveLocations.location       = New-Object System.Drawing.Point(590,200)
 $btnSaveLocations.Font           = New-Object System.Drawing.Font('Microsoft Sans Serif',10)
 
+$formFileSorter.controls.AddRange(@($lblDownloads,$txtDownloads,$lblDocuments,$txtDocuments,$lblPictures,$txtPictures,$lblVideos,
+$txtVideos,$btnSortFiles,$lblProgramInstallers,$TextBox1,$txtProgramInstallers,$btnDefaultLocations,$btnSaveLocations))
+
+$btnSortFiles.Add_Click({ Start-FileSorting })
+$btnDefaultLocations.Add_Click({ Set-DefaultLocations })
+$btnSaveLocations.Add_Click({ Save-FolderSettings })
+
 #----------------------------------------------------------[Declarations]----------------------------------------------------------
 
 #Timestamp Definition
@@ -236,6 +243,15 @@ Function Move-Files
         Break
     }
 }
+#Resets folder locations to default values
+Set-DefaultLocations
+{
+    $txtDownloads.Text = [string]$defaultTargetFolder
+    $txtPictures.Text = [string]$defaultPicturesFolder
+    $txtProgramInstallers.Text = [string]$defaultProgramInstallersFolder 
+    $txtDocuments.Text = [string]$defaultDocumentsFolder
+    $txtVideos.Text = [string]$defaultVideosFolder
+}
 
 #Saves costum folder locations to local file
 Function Save-FolderSettings
@@ -280,6 +296,6 @@ Function Start-FileSorting
 Create-Item -Item $appPath -Type Directory
 Create-Item -Item $logFile -Type File
 
-Create-Item -Item $costumFoldersFile -Type file
+[void]$formFileSorter.ShowDialog()
 
 Log-Finish -LogPath $logFile
