@@ -56,7 +56,6 @@ $txtDownloads.width              = 600
 $txtDownloads.height             = 20
 $txtDownloads.location           = New-Object System.Drawing.Point(170,16)
 $txtDownloads.Font               = New-Object System.Drawing.Font('Microsoft Sans Serif',10)
-$txtDownloads.ForeColor          = [System.Drawing.ColorTranslator]::FromHtml("#9b9b9b")
 
 $lblDocuments                    = New-Object system.Windows.Forms.Label
 $lblDocuments.text               = "Documents"
@@ -184,9 +183,13 @@ $costumFoldersName = "Costum-Folders.cvs"
 $costumFoldersFile = Join-Path -Path $appPath -ChildPath $costumFoldersName
 
 #Load Locations Folders
-if(Test-Path costumFoldersFile -eq $True)
+if((Test-Path $costumFoldersFile) -eq $true)
 {
-    
+    $txtDownloads.Text = $defaultSourceFolder
+    $txtPictures.Text = $defaultPicturesFolder
+    $txtProgramInstallers.Text = $defaultProgramInstallersFolder
+    $txtDocuments.Text = $defaultDocumentsFolder
+    $txtVideos.Text = $defaultVideosFolder
 }
 
 #-----------------------------------------------------------[Functions]------------------------------------------------------------
@@ -243,14 +246,15 @@ Function Move-Files
         Break
     }
 }
+
 #Resets folder locations to default values
-Set-DefaultLocations
-{
-    $txtDownloads.Text = [string]$defaultTargetFolder
-    $txtPictures.Text = [string]$defaultPicturesFolder
-    $txtProgramInstallers.Text = [string]$defaultProgramInstallersFolder 
-    $txtDocuments.Text = [string]$defaultDocumentsFolder
-    $txtVideos.Text = [string]$defaultVideosFolder
+function Set-DefaultLocations {
+    Out-Default "test"
+    $txtDownloads.Text = $defaultSourceFolder
+    $txtPictures.Text = $defaultPicturesFolder
+    $txtProgramInstallers.Text = $defaultProgramInstallersFolder
+    $txtDocuments.Text = $defaultDocumentsFolder
+    $txtVideos.Text = $defaultVideosFolder
 }
 
 #Saves costum folder locations to local file
@@ -270,17 +274,17 @@ Function Save-FolderSettings
 #Starts files moving from source to user library folders
 Function Start-FileSorting
 {
-    Get-Timestamp
+    #Get-Timestamp
 
-    $logEntry = $timestamp + " - File sorting started"
+    #$logEntry = $timestamp + " - File sorting started"
 
-    Log-Write -LogPath $logFile -LineValue $logEntry
+    #Log-Write -LogPath $logFile -LineValue $logEntry
    
     Move-Files -Extensions $documentExtensions -Destination $documentsFolder
     Move-Files -Extensions $pictureExtensions -Destination $picturesFolder
     Move-Files -Extensions $videoExtensions -Destination $videosFolder
     Move-Files -Extensions $installerExtensions -Destination $programInstallersFolder
-
+    <#
     End
     {
         If($True)
@@ -289,12 +293,13 @@ Function Start-FileSorting
             Log-Write -LogPath $logFile -LineValue "=============================================================================="
         }
     }
+    #>
 }
 
 #-----------------------------------------------------------[Execution]------------------------------------------------------------
 
-Create-Item -Item $appPath -Type Directory
-Create-Item -Item $logFile -Type File
+New-ItemConditionalCreation -Item $appPath -Type Directory
+New-ItemConditionalCreation -Item $logFile -Type File
 
 [void]$formFileSorter.ShowDialog()
 
