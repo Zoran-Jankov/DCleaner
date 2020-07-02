@@ -16,7 +16,7 @@
 .OUTPUTS
   Log file stored in "%APPDATA%\File-Sorter\File-Sorter-Log.log"
 .NOTES
-  Version:        0.9
+  Version:        0.14
   Author:         Zoran Jankov
   Creation Date:  30.06.2020.
   Purpose/Change: Initial script development
@@ -107,7 +107,8 @@ $btnSortFiles.text               = "Sort Files"
 $btnSortFiles.width              = 150
 $btnSortFiles.height             = 30
 $btnSortFiles.location           = New-Object System.Drawing.Point(325,200)
-$btnSortFiles.Font               = New-Object System.Drawing.Font('Microsoft Sans Serif',10,[System.Drawing.FontStyle]([System.Drawing.FontStyle]::Bold))
+$btnSortFiles.Font               = New-Object System.Drawing.Font('Microsoft Sans Serif',10,
+                                   [System.Drawing.FontStyle]([System.Drawing.FontStyle]::Bold))
 
 $lblProgramInstallers            = New-Object system.Windows.Forms.Label
 $lblProgramInstallers.text       = "Program Installers"
@@ -116,13 +117,6 @@ $lblProgramInstallers.width      = 25
 $lblProgramInstallers.height     = 10
 $lblProgramInstallers.location   = New-Object System.Drawing.Point(20,140)
 $lblProgramInstallers.Font       = New-Object System.Drawing.Font('Microsoft Sans Serif',10)
-
-$TextBox1                        = New-Object system.Windows.Forms.TextBox
-$TextBox1.multiline              = $false
-$TextBox1.width                  = 0
-$TextBox1.height                 = 20
-$TextBox1.location               = New-Object System.Drawing.Point(144,140)
-$TextBox1.Font                   = New-Object System.Drawing.Font('Microsoft Sans Serif',10)
 
 $txtProgramInstallers            = New-Object system.Windows.Forms.TextBox
 $txtProgramInstallers.multiline  = $false
@@ -164,13 +158,6 @@ $defaultProgramInstallersFolder = "D:\Program Installers\"
 $defaultDocumentsFolder = [environment]::getfolderpath("mydocuments")
 $defaultVideosFolder = [environment]::getfolderpath("myvideos")
 
-#Current Paths
-$sourceFolder = $defaultTargetFolder
-$picturesFolder = $defaultPicturesFolder
-$programInstallersFolder = $defaultProgramInstallersFolder 
-$documentsFolder = $defaultDocumentsFolder
-$videosFolder = $defaultVideosFolder
-
 #Aplication Folder Info
 $appPath = $env:APPDATA + "\File-Sorter"
 
@@ -182,19 +169,9 @@ $logFile = Join-Path -Path $appPath -ChildPath $logName
 $costumFoldersName = "Costum-Folders.cvs"
 $costumFoldersFile = Join-Path -Path $appPath -ChildPath $costumFoldersName
 
-#Load Locations Folders
-if((Test-Path $costumFoldersFile) -eq $true)
-{
-    $txtDownloads.Text = $defaultSourceFolder
-    $txtPictures.Text = $defaultPicturesFolder
-    $txtProgramInstallers.Text = $defaultProgramInstallersFolder
-    $txtDocuments.Text = $defaultDocumentsFolder
-    $txtVideos.Text = $defaultVideosFolder
-}
-
 #-----------------------------------------------------------[Functions]------------------------------------------------------------
 
-#Creates necessary files and directory in %APPDATA% directory
+#Creates necessary files and folders in %APPDATA% folder
 Function New-ItemConditionalCreation
 {
     param($Item, $Type)
@@ -205,10 +182,16 @@ Function New-ItemConditionalCreation
     }
 }
 
-#Refreshes formatted timestamp variable - $timestamp
-Function Get-Timestamp
+#Writes log entry
+Function Write-Log
 {
+    param($Message)
+
     $timestamp = Get-Date -Format "yyyy.MM.dd. HH:mm:ss"
+
+    $logEntry = $timestamp + " - " + $Message 
+
+    Log-Write -LogPath $logFile -LineValue $logEntry
 }
 
 #Moves files with defined extensions from source folder to defined destination folder
@@ -216,11 +199,9 @@ Function Move-Files
 {
     param($Extensions, $Destination)
 
-    Get-Timestamp
+    $massage = "Started moving files to " + $Destination
 
-    $logEntry = $timestamp + " - Started moving files to " + $Destination
-
-    Log-Write -LogPath $logFile -LineValue $logEntry
+    Write-Log -Message $massage
 
     Try
     {
@@ -232,11 +213,9 @@ Function Move-Files
 
             Move-Item -Path $file -Destination $Destination
 
-            Get-Timestamp
+            $massage = $file.Name + " moved to " + $Destination
 
-            $logEntry = $timestamp + " - " + $file.Name + " moved to " + $Destination
-
-            Log-Write -LogPath $logFile -LineValue $logEntry
+            Write-Log -Message $massage
         }
     }
 
@@ -248,8 +227,8 @@ Function Move-Files
 }
 
 #Resets folder locations to default values
-function Set-DefaultLocations {
-    Out-Default "test"
+function Set-DefaultLocations
+{
     $txtDownloads.Text = $defaultSourceFolder
     $txtPictures.Text = $defaultPicturesFolder
     $txtProgramInstallers.Text = $defaultProgramInstallersFolder
@@ -263,7 +242,7 @@ Function Save-FolderSettings
     if((Test-Path $costumFoldersFile) -eq $False)
     {
         New-Item -Path $costumFoldersFile -ItemType File
-        Add-Content -Path $costumFoldersFile -Value '"FolderName","Path"'
+        Add-Content -Path $costumFoldersFile -Value '"FolderName";"Path"'
     }
     else
     {
@@ -274,29 +253,37 @@ Function Save-FolderSettings
 #Starts files moving from source to user library folders
 Function Start-FileSorting
 {
-    #Get-Timestamp
+    Write-Log -Message "File sorting started"
 
-    #$logEntry = $timestamp + " - File sorting started"
+    #Get Locations
+    $sourceFolder = $txtDownloads.Text
+    $documentsFolder = $txtDocuments.Text
+    $picturesFolder = $txtPictures.Text
+    $videosFolder = $txtVideos.Text
+    $programInstallersFolder = $txtProgramInstallers.Text
 
-    #Log-Write -LogPath $logFile -LineValue $logEntry
-   
+    #Moves files from source to user library folders 
     Move-Files -Extensions $documentExtensions -Destination $documentsFolder
     Move-Files -Extensions $pictureExtensions -Destination $picturesFolder
     Move-Files -Extensions $videoExtensions -Destination $videosFolder
     Move-Files -Extensions $installerExtensions -Destination $programInstallersFolder
-    <#
-    End
-    {
-        If($True)
-        {
-            Log-Write -LogPath $logFile -LineValue "Completed Successfully."
-            Log-Write -LogPath $logFile -LineValue "=============================================================================="
-        }
-    }
-    #>
+    
+    Log-Write -LogPath $logFile -LineValue "Completed Successfully."
+    Log-Write -LogPath $logFile -LineValue "=============================================================================="
+
 }
 
 #-----------------------------------------------------------[Execution]------------------------------------------------------------
+
+#Load Locations Folders
+if((Test-Path $costumFoldersFile) -eq $True)
+{
+    Set-DefaultLocations
+}
+else
+{
+    
+}
 
 New-ItemConditionalCreation -Item $appPath -Type Directory
 New-ItemConditionalCreation -Item $logFile -Type File
