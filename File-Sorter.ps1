@@ -56,7 +56,6 @@ $txtDownloads.width              = 600
 $txtDownloads.height             = 20
 $txtDownloads.location           = New-Object System.Drawing.Point(170,60)
 $txtDownloads.Font               = New-Object System.Drawing.Font('Microsoft Sans Serif',10)
-$txtDownloads.ForeColor          = [System.Drawing.ColorTranslator]::FromHtml("#9b9b9b")
 
 $lblDocuments                    = New-Object system.Windows.Forms.Label
 $lblDocuments.text               = "Documents"
@@ -214,11 +213,11 @@ Function Write-Log
 #Moves files with defined extensions from source folder to defined destination folder
 Function Move-Files
 {
-    param($Extensions, $Source, $Destination)
+    param($Extensions, $Source, $Destination, $LogFile)
 
     $massage = "Started moving files to " + $Destination
 
-    Write-Log -Message $massage -LogFile $logFile
+    Write-Log -Message $massage -LogFile $LogFile
 
     Try
     {
@@ -232,7 +231,7 @@ Function Move-Files
 
     Catch
     {
-        Log-Error -LogPath $logFile -ErrorDesc $_.Exception -ExitGracefully $True
+        Log-Error -LogPath $LogFile -ErrorDesc $_.Exception -ExitGracefully $True
         Break
     }
 }
@@ -250,10 +249,10 @@ Function Start-FileSorting
     $programInstallersFolder = $txtProgramInstallers.Text
 
     #Moves files from source to user library folders 
-    Move-Files -Extensions $documentExtensions -Source $sourceFolder -Destination $documentsFolder
-    Move-Files -Extensions $pictureExtensions -Source $sourceFolder -Destination $picturesFolder
-    Move-Files -Extensions $videoExtensions -Source $sourceFolder -Destination $videosFolder
-    Move-Files -Extensions $installerExtensions -Source $sourceFolder -Destination $programInstallersFolder
+    Move-Files -Extensions $documentExtensions -Source $sourceFolder -Destination $documentsFolder -LogFile $logFile
+    Move-Files -Extensions $pictureExtensions -Source $sourceFolder -Destination $picturesFolder -LogFile $logFile
+    Move-Files -Extensions $videoExtensions -Source $sourceFolder -Destination $videosFolder -LogFile $logFile
+    Move-Files -Extensions $installerExtensions -Source $sourceFolder -Destination $programInstallersFolder -LogFile $logFile
     
     Log-Write -LogPath $logFile -LineValue "Completed Successfully."
     Log-Write -LogPath $logFile -LineValue "==============================================================================="
