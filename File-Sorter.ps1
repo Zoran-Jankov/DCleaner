@@ -28,10 +28,10 @@
 $ErrorActionPreference = "SilentlyContinue"
 
 #Set known extensions
-$documentExtensions = "\*.DOC", "\*.DOCX", "\*.HTML", "\*.HTM", "\*.ODT", "\*.PDF", "\*.XLS", "\*.XLSX", "\*.ODS", "\*.PPT", "\*.PPTX", "\*.TXT", "\*.LOG"
-$installerExtensions = "\*.exe", "\*.msi", "\*.msm", "\*.msp", "\*.mst", "\*.idt", "\*.idt", "\*.cub", "\*.pcp", "\*.jar"
-$pictureExtensions = "\*.JPG", "\*.PNG", "\*.GIF", "\*.WEBP", "\*.TIFF", "\*.SD", "\*.RAW", "\*.BMP", "\*.HEIF", "\*.INDD", "\*.JPEG", "\*.SVG", "\*.AI", "\*.EPS", "\*.PDF"
-$videoExtensions = "\*.WEBM", "\*.MPG", "\*.MP2", "\*.MPEG", "\*.MPE", "\*.MPV", "\*.OGG", "\*.MP4", "\*.M4P", "\*.M4V", "\*.AVI", "\*.WMV", "\*.MO", "\*.QT", "\*.FLV", "\*.SWF", "\*.AVCHD"
+$documentExtensions = "*.DOC", "*.DOCX", "*.HTML", "*.HTM", "*.ODT", "*.PDF", "*.XLS", "*.XLSX", "*.ODS", "*.PPT", "*.PPTX", "*.TXT", "*.LOG"
+$installerExtensions = "*.exe", "*.msi", "*.msm", "*.msp", "*.mst", "*.idt", "*.idt", "*.cub", "*.pcp", "*.jar"
+$pictureExtensions = "*.JPG", "*.PNG", "*.GIF", "*.WEBP", "*.TIFF", "*.SD", "*.RAW", "*.BMP", "*.HEIF", "*.INDD", "*.JPEG", "*.SVG", "*.AI", "*.EPS", "*.PDF", "*.cvs"
+$videoExtensions = "*.WEBM", "*.MPG", "*.MP2", "*.MPEG", "*.MPE", "*.MPV", "*.OGG", "*.MP4", "*.M4P", "*.M4V", "*.AVI", "*.WMV", "*.MO", "*.QT", "*.FLV", "*.SWF", "*.AVCHD"
 
 #Create GUI
 Add-Type -AssemblyName System.Windows.Forms
@@ -178,7 +178,7 @@ $defaultVideosFolder = [environment]::getfolderpath("myvideos")
 $appPath = $env:APPDATA + "\File Sorter"
 
 #Log File Info
-$logName = "File-Sorter-Log.log"
+$logName = "File-Sorter-Log.txt"
 $logFile = Join-Path -Path $appPath -ChildPath $logName
 
 #Custom Folder Location File Info
@@ -191,7 +191,7 @@ $customFoldersFile = Join-Path -Path $appPath -ChildPath $customFoldersName
 Function New-ItemConditionalCreation
 {
     param($Item, $Type)
-
+    
     if((Test-Path $Item) -eq $False)
     {
         New-Item -Path $Item -ItemType $Type
@@ -201,37 +201,37 @@ Function New-ItemConditionalCreation
 #Writes log entry
 Function Write-Log
 {
-    param($Message, $LogFile)
+    param($Message)
 
     $timestamp = Get-Date -Format "yyyy.MM.dd. HH:mm:ss"
-
     $logEntry = $timestamp + " - " + $Message 
-
-    Log-Write -LogPath $LogFile -LineValue $logEntry
+    Add-content $logfile -Value $logEntry
 }
 
 #Moves files with defined extensions from source folder to defined destination folder
 Function Move-Files
 {
-    param($Extensions, $Source, $Destination, $LogFile)
+    param($Extensions, $Source, $Destination)
 
     $massage = "Started moving files to " + $Destination
-
-    Write-Log -Message $massage -LogFile $LogFile
+    Write-Log -Message $massage
 
     Try
     {
         foreach($extension in $Extensions)
         {
-            $path = $Source + $extension
-
-            Get-ChildItem -Path $path | Move-Item -Destination $Destination
+            $path = Join-Path -Path $Source -ChildPath $extension
+            Get-ChildItem -Path $path | ForEach-Object
+            {
+                Move-Item -Item $_ -Destination $Destination
+                Write-Log -Message  $_.NAME + " moved to " $Destination
+            }
         }
     }
 
     Catch
     {
-        Log-Error -LogPath $LogFile -ErrorDesc $_.Exception -ExitGracefully $True
+        Write-Log -Message $_.Exception 
         Break
     }
 }
@@ -239,7 +239,7 @@ Function Move-Files
 #Starts files moving from source to user library folders
 Function Start-FileSorting
 {
-    Write-Log -Message "File sorting started" -LogFile $logFile
+    Write-Log -Message "File sorting started"
 
     #Get Locations
     $sourceFolder = $txtDownloads.Text
@@ -249,13 +249,13 @@ Function Start-FileSorting
     $programInstallersFolder = $txtProgramInstallers.Text
 
     #Moves files from source to user library folders 
-    Move-Files -Extensions $documentExtensions -Source $sourceFolder -Destination $documentsFolder -LogFile $logFile
-    Move-Files -Extensions $pictureExtensions -Source $sourceFolder -Destination $picturesFolder -LogFile $logFile
-    Move-Files -Extensions $videoExtensions -Source $sourceFolder -Destination $videosFolder -LogFile $logFile
-    Move-Files -Extensions $installerExtensions -Source $sourceFolder -Destination $programInstallersFolder -LogFile $logFile
+    Move-Files -Extensions $documentExtensions -Source $sourceFolder -Destination $documentsFolder 
+    Move-Files -Extensions $pictureExtensions -Source $sourceFolder -Destination $picturesFolder
+    Move-Files -Extensions $videoExtensions -Source $sourceFolder -Destination $videosFolder
+    Move-Files -Extensions $installerExtensions -Source $sourceFolder -Destination $programInstallersFolder
     
-    Log-Write -LogPath $logFile -LineValue "Completed Successfully."
-    Log-Write -LogPath $logFile -LineValue "==============================================================================="
+    Write-Log -Message "Completed Successfully."
+    Write-Log -Message "=========================================================================================================="
 }
 
 #Resets folder locations to default values
@@ -278,7 +278,7 @@ Function Save-FolderSettings
     }
     else
     {
-        Import -Path $customFoldersFile
+        Import-Clixml -Path $customFoldersFile
     }
 
     #TODO save custom folder locations 
