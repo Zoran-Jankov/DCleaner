@@ -221,10 +221,13 @@ Function Move-Files
         foreach($extension in $Extensions)
         {
             $path = Join-Path -Path $Source -ChildPath $extension
-            Get-ChildItem -Path $path | ForEach-Object
+            $files = Get-ChildItem -Path $path
+
+            foreach($file in $files)
             {
-                Move-Item -Item $_ -Destination $Destination
-                Write-Log -Message  $_.NAME + " moved to " $Destination
+                Move-Item -Path $file.FullName -Destination $Destination
+                $logEntry = $file.Name + " moved to " + $Destination
+                Write-Log -Message $logEntry
             }
         }
     }
