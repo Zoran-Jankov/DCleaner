@@ -192,7 +192,7 @@ Function New-ItemConditionalCreation
 {
     param($Item, $Type)
     
-    if((Test-Path $Item) -eq $False)
+    if((Test-Path $Item) -eq $false)
     {
         New-Item -Path $Item -ItemType $Type
     }
@@ -237,6 +237,9 @@ Function Move-Files
         Write-Log -Message $_.Exception 
         Break
     }
+
+    $massage = "Finished moving files to " + $Destination
+    Write-Log -Message $massage
 }
 
 #Starts files moving from source to user library folders
@@ -258,7 +261,7 @@ Function Start-FileSorting
     Move-Files -Extensions $installerExtensions -Source $sourceFolder -Destination $programInstallersFolder
     
     Write-Log -Message "Completed Successfully."
-    Write-Log -Message "=========================================================================================================="
+    Add-Content -Path $logFile -Value "==========================================================================================="
 }
 
 #Resets folder locations to default values
@@ -277,11 +280,12 @@ Function Save-FolderSettings
     if((Test-Path -Path $customFoldersFile) -eq $false)
     {
         New-Item -Path $customFoldersFile -ItemType File
-        Add-Content -Path $customFoldersFile -Value '"FolderName";"Path"'
+        [xml]$xmlCustomFolders = Get-Content -Path $customFoldersFile
+        [xml]$xmlCustomFolders.CreateNode("Source").Value("$txtDownloads")
     }
     else
     {
-        Import-Clixml -Path $customFoldersFile
+        
     }
 
     #TODO save custom folder locations 
