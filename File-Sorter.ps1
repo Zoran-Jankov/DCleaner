@@ -161,6 +161,7 @@ $formFileSorter.controls.AddRange(@($lblDownloads,$txtDownloads,$lblDocuments,$t
 $txtVideos,$btnSortFiles,$lblProgramInstallers,$txtProgramInstallers,$btnDefaultLocations,$btnSaveLocations,$lblSourceFolder,
 $lblDestinationFolders))
 
+#Adding events to buttons
 $btnSortFiles.Add_Click({ Start-FileSorting })
 $btnDefaultLocations.Add_Click({ Set-DefaultLocations })
 $btnSaveLocations.Add_Click({ Save-FolderSettings })
@@ -187,7 +188,25 @@ $customFoldersFile = Join-Path -Path $appPath -ChildPath $customFoldersName
 
 #-----------------------------------------------------------[Functions]------------------------------------------------------------
 
-#Creates necessary files and folders in %APPDATA% folder
+<#
+.SYNOPSIS
+Creates necessary files and folders for the application
+
+.DESCRIPTION
+Crates files and folders with parameterized path and type only if specified file does not already exist.
+
+.PARAMETER Item
+Full name of file or folder. If it is a file extension is included.
+
+.PARAMETER Type
+Item type (File, Directory)
+
+.EXAMPLE
+New-ItemConditionalCreation -Item "D:\Test.txt" -Type File
+
+.NOTES
+
+#>
 Function New-ItemConditionalCreation
 {
     param($Item, $Type)
@@ -198,7 +217,23 @@ Function New-ItemConditionalCreation
     }
 }
 
-#Writes log entry
+<#
+.SYNOPSIS
+Writes a log entry
+
+.DESCRIPTION
+Creates a log entry with timestamp and message passed thru a parameter $Massage, and saves the log entry to log file in 
+%APPDATA%\File Sorter\File Sorter Log.txt
+
+.PARAMETER Message
+String value to be writen in the log file alongside timestamp
+
+.EXAMPLE
+Write-Log -Message "File sorting started"
+
+.NOTES
+Format of the timestamp in "yyyy.MM.dd. HH:mm:ss" and this function added " - " after timestamp and before the main massage.
+#>
 Function Write-Log
 {
     param($Message)
