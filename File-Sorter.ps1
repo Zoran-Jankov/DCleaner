@@ -209,7 +209,7 @@ New-ItemConditionalCreation -Item "D:\Test.txt" -Type File
 #>
 Function New-ItemConditionalCreation
 {
-    param($Item, $Type)
+    param([String]$Item, [String]$Type)
     
     if((Test-Path $Item) -eq $false)
     {
@@ -236,7 +236,7 @@ Format of the timestamp in "yyyy.MM.dd. HH:mm:ss" and this function added " - " 
 #>
 Function Write-Log
 {
-    param($Message)
+    param([String]$Message)
 
     $timestamp = Get-Date -Format "yyyy.MM.dd. HH:mm:ss"
     $logEntry = $timestamp + " - " + $Message 
@@ -246,7 +246,7 @@ Function Write-Log
 #Moves files with defined extensions from source folder to defined destination folder
 Function Move-Files
 {
-    param($Extensions, $Source, $Destination)
+    param([String]$Extensions, [String]$Source, [String]$Destination)
 
     $massage = "Started moving files to " + $Destination
     Write-Log -Message $massage
