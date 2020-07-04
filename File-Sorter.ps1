@@ -209,6 +209,8 @@ New-ItemConditionalCreation -Item "D:\Test.txt" -Type File
 #>
 Function New-ItemConditionalCreation
 {
+    CmdletBinding(SupportsShouldProcess = $true)
+
     param([String]$Item, [String]$Type)
     
     if((Test-Path $Item) -eq $false)
@@ -280,6 +282,8 @@ Function Move-Files
 #Starts files moving from source to user library folders
 Function Start-FileSorting
 {
+    CmdletBinding(SupportsShouldProcess = $true)
+
     Write-Log -Message "File sorting started"
 
     #Get Locations
@@ -302,6 +306,8 @@ Function Start-FileSorting
 #Resets folder locations to default values
 Function Set-DefaultLocations
 {
+    CmdletBinding(SupportsShouldProcess = $true)
+
     $txtDownloads.Text = $defaultSourceFolder
     $txtPictures.Text = $defaultPicturesFolder
     $txtProgramInstallers.Text = $defaultProgramInstallersFolder
@@ -312,6 +318,7 @@ Function Set-DefaultLocations
 #Saves custom folder locations to local file
 Function Save-FolderSettings
 {
+    
     if((Test-Path -Path $customFoldersFile) -eq $false)
     {
         New-Item -Path $customFoldersFile -ItemType File
@@ -334,7 +341,11 @@ if((Test-Path $customFoldersName) -eq $false)
     Set-DefaultLocations
 }
 
+#Create necessary folder for application files if it does not exists
 New-ItemConditionalCreation -Item $appPath -Type Directory
+
+#Create log file for application if it does not exists
 New-ItemConditionalCreation -Item $logFile -Type File
 
+#Launch GUI
 [void]$formFileSorter.ShowDialog()
