@@ -4,9 +4,9 @@
 .SYNOPSIS
   Moves files from a source folder to Videos, Pictures, Documents and Program Installers folders based on file extensions.
 .DESCRIPTION
-  In the source folder all files are checked and moved to Videos, Pictures, Documents and Program Installers folders based on file 
-  extensions. Paths to source folder and to user libraries can be defined by the user, and can besaved permanently to local 
-  computer, butthere are default values for those paths. File sorting is not performed in subfolders of the target folder and they 
+  In the source folder all files are checked and moved to Videos, Pictures, Documents and Program Installers folders based on file
+  extensions. Paths to source folder and to user libraries can be defined by the user, and can besaved permanently to local
+  computer, butthere are default values for those paths. File sorting is not performed in subfolders of the target folder and they
   are not moved by the script.
 .INPUTS
   Path to target, Videos, Documents, Pictures and Program Installers folders can by the user, and there are tree buttons:
@@ -222,7 +222,7 @@ Function New-ItemConditionalCreation
 Writes a log entry
 
 .DESCRIPTION
-Creates a log entry with timestamp and message passed thru a parameter $Massage, and saves the log entry to log file in 
+Creates a log entry with timestamp and message passed thru a parameter $Massage, and saves the log entry to log file in
 %APPDATA%\File Sorter\File Sorter Log.txt
 
 .PARAMETER Message
