@@ -1,7 +1,6 @@
 # File-Sorter
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/c735e36fa1c949a7bf06ca902e8eb29b)](https://app.codacy.com/manual/zoran.jankov.87/File-Sorter?utm_source=github.com&utm_medium=referral&utm_content=Zoran-Jankov/File-Sorter&utm_campaign=Badge_Grade_Dashboard)
-
 [![CodeFactor](https://www.codefactor.io/repository/github/zoran-jankov/file-sorter/badge)](https://www.codefactor.io/repository/github/zoran-jankov/file-sorter)
 
 ![](https://github.com/Zoran-Jankov/File-Sorter/blob/master/File%20Sorter.png)
