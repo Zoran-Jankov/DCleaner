@@ -207,7 +207,7 @@ New-ItemConditionalCreation -Item "D:\Test.txt" -Type File
 .NOTES
 
 #>
-Function New-ItemConditionalCreation
+function New-ItemConditionalCreation
 {
     param([String]$Item, [String]$Type)
 
@@ -234,7 +234,7 @@ Write-Log -Message "File sorting started"
 .NOTES
 Format of the timestamp in "yyyy.MM.dd. HH:mm:ss" and this function added " - " after timestamp and before the main massage.
 #>
-Function Write-Log
+function Write-Log
 {
     param([String]$Message)
 
@@ -244,7 +244,7 @@ Function Write-Log
 }
 
 #Moves files with defined extensions from source folder to defined destination folder
-Function Move-Files
+function Move-Files
 {
     param([String]$Extensions, [String]$Source, [String]$Destination)
 
@@ -278,7 +278,7 @@ Function Move-Files
 }
 
 #Starts files moving from source to user library folders
-Function Start-FileSorting
+function Start-FileSorting
 {
     Write-Log -Message "File sorting started"
 
@@ -300,7 +300,7 @@ Function Start-FileSorting
 }
 
 #Resets folder locations to default values
-Function Set-DefaultLocations
+function Set-DefaultLocations
 {
     $txtDownloads.Text = $defaultSourceFolder
     $txtPictures.Text = $defaultPicturesFolder
@@ -310,20 +310,52 @@ Function Set-DefaultLocations
 }
 
 #Saves custom folder locations to local file
-Function Save-FolderSettings
+function Save-FolderSettings
 {
     if((Test-Path -Path $customFoldersFile) -eq $false)
     {
-        New-Item -Path $customFoldersFile -ItemType File
-        [xml]$xmlCustomFolders = Get-Content -Path $customFoldersFile
-        [xml]$xmlCustomFolders.CreateNode("Source").Value("$txtDownloads")
-    }
-    else
-    {
-        
+        #Set The Formatting
+        $xmlsettings = New-Object System.Xml.XmlWriterSettings
+        $xmlsettings.Indent = $true
+        $xmlsettings.IndentChars = "    "
+
+        #Set the File Name Create The Document
+        $XmlWriter = [System.XML.XmlWriter]::Create($customFoldersFile, $xmlsettings)
+
+        #Write the XML Decleration and set the XSL
+        $xmlWriter.WriteStartDocument()
+        $xmlWriter.WriteProcessingInstruction("xml-stylesheet", "type='text/xsl' href='style.xsl'")
+
+        #Start the Root Element
+        $xmlWriter.WriteStartElement("Root")
+
+        Save-Path -Name "Source" -Path $txtDownloads.Text
+        Save-Path -Name "Documents" -Path $txtDocuments.Text
+        Save-Path -Name "Pictures" -Path $txtPictures.Text
+        Save-Path -Name "Videos" -Path $txtVideos.Text
+        Save-Path -Name "ProgramInstallers" -Path $txtProgramInstallers.Text
+
+        $xmlWriter.WriteEndElement()
+
+        #End, Finalize and close the XML Document
+        $xmlWriter.WriteEndDocument()
+        $xmlWriter.Flush()
+        $xmlWriter.Close()
     }
 
-    #TODO save custom folder locations
+    #TODO Update saved paths
+}
+
+#Save folder path
+function Save-Path
+{
+    param ([string]$Name, [string]$Path)
+    
+    $xmlWriter.WriteStartElement($Name)
+
+    $xmlWriter.WriteElementString("Path",$Path)
+
+    $xmlWriter.WriteEndElement()
 }
 
 #-----------------------------------------------------------[Execution]------------------------------------------------------------
