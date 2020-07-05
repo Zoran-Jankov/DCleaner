@@ -294,7 +294,7 @@ Function Start-FileSorting
     Move-Files -Extensions $pictureExtensions -Source $sourceFolder -Destination $picturesFolder
     Move-Files -Extensions $videoExtensions -Source $sourceFolder -Destination $videosFolder
     Move-Files -Extensions $installerExtensions -Source $sourceFolder -Destination $programInstallersFolder
-    
+
     Write-Log -Message "Completed Successfully."
     Add-Content -Path $logFile -Value "==========================================================================================="
 }
