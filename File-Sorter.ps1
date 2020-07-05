@@ -24,6 +24,9 @@
 
 #---------------------------------------------------------[Initialisations]--------------------------------------------------------
 
+#Set Execution Policy
+Set-ExecutionPolicy Unrestricted
+
 #Set Error Action to Silently Continue
 $ErrorActionPreference = "SilentlyContinue"
 
@@ -210,7 +213,7 @@ New-ItemConditionalCreation -Item "D:\Test.txt" -Type File
 Function New-ItemConditionalCreation
 {
     param([String]$Item, [String]$Type)
-    
+
     if((Test-Path $Item) -eq $false)
     {
         New-Item -Path $Item -ItemType $Type
@@ -239,7 +242,7 @@ Function Write-Log
     param([String]$Message)
 
     $timestamp = Get-Date -Format "yyyy.MM.dd. HH:mm:ss"
-    $logEntry = $timestamp + " - " + $Message 
+    $logEntry = $timestamp + " - " + $Message
     Add-content $logfile -Value $logEntry
 }
 
@@ -269,7 +272,7 @@ Function Move-Files
 
     Catch
     {
-        Write-Log -Message $_.Exception 
+        Write-Log -Message $_.Exception
         Break
     }
 
@@ -289,8 +292,8 @@ Function Start-FileSorting
     $videosFolder = $txtVideos.Text
     $programInstallersFolder = $txtProgramInstallers.Text
 
-    #Moves files from source to user library folders 
-    Move-Files -Extensions $documentExtensions -Source $sourceFolder -Destination $documentsFolder 
+    #Moves files from source to user library folders
+    Move-Files -Extensions $documentExtensions -Source $sourceFolder -Destination $documentsFolder
     Move-Files -Extensions $pictureExtensions -Source $sourceFolder -Destination $picturesFolder
     Move-Files -Extensions $videoExtensions -Source $sourceFolder -Destination $videosFolder
     Move-Files -Extensions $installerExtensions -Source $sourceFolder -Destination $programInstallersFolder
@@ -323,7 +326,7 @@ Function Save-FolderSettings
         
     }
 
-    #TODO save custom folder locations 
+    #TODO save custom folder locations
 }
 
 #-----------------------------------------------------------[Execution]------------------------------------------------------------
@@ -337,4 +340,5 @@ if((Test-Path $customFoldersName) -eq $false)
 New-ItemConditionalCreation -Item $appPath -Type Directory
 New-ItemConditionalCreation -Item $logFile -Type File
 
+#Launch Window
 [void]$formFileSorter.ShowDialog()
