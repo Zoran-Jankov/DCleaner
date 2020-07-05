@@ -4,10 +4,10 @@
 .SYNOPSIS
   Moves files from a source folder to Videos, Pictures, Documents and Program Installers folders based on file extensions.
 .DESCRIPTION
-  In the source folder all files are checked and moved to Videos, Pictures, Documents and Program Installers folders based on file
-  extensions. Paths to source folder and to user libraries can be defined by the user, and can besaved permanently to local
-  computer, butthere are default values for those paths. File sorting is not performed in subfolders of the target folder and they
-  are not moved by the script.
+  This application moves files from the source folder to user libraries. In the source folder all files are checked and moved to
+  Videos, Pictures, Documents and Program Installers folders based on file extensions. Paths to target folder and to user libraries
+  can be defined by the user, and saved permanently to local computer, but there are default values for those paths.
+  File sorting is not performed in subfolders of the target folder and they are not moved by the script.
 .INPUTS
   Path to target, Videos, Documents, Pictures and Program Installers folders can by the user, and there are tree buttons:
   Default Locations - restores default paths for all folders.
@@ -23,9 +23,6 @@
 #>
 
 #---------------------------------------------------------[Initialisations]--------------------------------------------------------
-
-#Set Execution Policy
-Set-ExecutionPolicy Unrestricted
 
 #Set Error Action to Silently Continue
 $ErrorActionPreference = "SilentlyContinue"
