@@ -1,6 +1,4 @@
 ﻿<#
-.NAME
-    Downloaded Files Sorter
 .SYNOPSIS
   Moves files from a source folder to Videos, Pictures, Documents and Program Installers folders based on file extensions.
 .DESCRIPTION
@@ -38,7 +36,7 @@ Add-Type -AssemblyName System.Windows.Forms
 [System.Windows.Forms.Application]::EnableVisualStyles()
 
 $formFileSorter                  = New-Object system.Windows.Forms.Form
-$formFileSorter.ClientSize       = New-Object System.Drawing.Point(795,323)
+$formFileSorter.ClientSize       = New-Object System.Drawing.Point(795,325)
 $formFileSorter.text             = "File Sorter"
 $formFileSorter.TopMost          = $true
 
@@ -232,7 +230,7 @@ String value to be writen in the log file alongside timestamp
 Write-Log -Message "File sorting started"
 
 .NOTES
-Format of the timestamp in "yyyy.MM.dd. HH:mm:ss" and this function added " - " after timestamp and before the main massage.
+Format of the timestamp in "yyyy.MM.dd. HH:mm:ss" and this function adds " - " after timestamp and before the main massage.
 #>
 function Write-Log
 {
