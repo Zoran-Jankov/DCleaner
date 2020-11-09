@@ -3,7 +3,7 @@
 [![made-with-powershell](https://img.shields.io/badge/PowerShell-1f425f?logo=Powershell)](https://microsoft.com/PowerShell)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/37f65681225b42fcb9811a2ef8bde77f)](https://www.codacy.com/gh/Zoran-Jankov/DCleaner/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Zoran-Jankov/DCleaner&amp;utm_campaign=Badge_Grade)
-[![CodeFactor](https://www.codefactor.io/repository/github/zoran-jankov/file-sorter/badge)](https://www.codefactor.io/repository/github/zoran-jankov/file-sorter)
+[![CodeFactor](https://www.codefactor.io/repository/github/zoran-jankov/dcleaner/badge)](https://www.codefactor.io/repository/github/zoran-jankov/dcleaner)
 
 ## Description
 
