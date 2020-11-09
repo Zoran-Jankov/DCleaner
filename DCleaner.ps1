@@ -287,34 +287,7 @@ $customFoldersFile = Join-Path -Path $appPath -ChildPath $customFoldersName
 
 #-----------------------------------------------------------[Functions]------------------------------------------------------------
 
-<#
-.SYNOPSIS
-Creates necessary files and folders for the application
-
-.DESCRIPTION
-Crates files and folders with parameterized path and type only if specified file does not already exist.
-
-.PARAMETER Item
-Full name of file or folder. If it is a file extension is included.
-
-.PARAMETER Type
-Item type (File, Directory)
-
-.EXAMPLE
-New-ItemConditionalCreation -Item "D:\Test.txt" -Type File
-
-.NOTES
-
-#>
-function New-ItemConditionalCreation
-{
-    param([String]$Item, [String]$Type)
-
-    if((Test-Path $Item) -eq $false)
-    {
-        New-Item -Path $Item -ItemType $Type
-    }
-}
+Import-Module "$PSScriptRoot\Modules\New-ItemConditionalCreation.psm1"
 
 #Moves files with defined extensions from source folder to defined destination folder
 function Move-Files
