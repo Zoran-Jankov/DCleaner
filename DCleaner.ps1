@@ -19,8 +19,8 @@ Log file stored in "%APPDATA%\File Sorter\File-Sorter-Log.log"
 Custom folder locations are saved to "%APPDATA%\File Sorter\Custom-Folders.xml"
 
 .NOTES
-    Version:        1.0
-    Author:         Zoran Jankov
+Version:        1.0
+Author:         Zoran Jankov
 #>
 
 #---------------------------------------------------------[Initialisations]--------------------------------------------------------
@@ -35,20 +35,21 @@ $pictureExtensions = "*.JPG", "*.PNG", "*.GIF", "*.WEBP", "*.TIFF", "*.SD", "*.R
 $videoExtensions = "*.WEBM", "*.MPG", "*.MP2", "*.MPEG", "*.MPE", "*.MPV", "*.OGG", "*.MP4", "*.M4P", "*.M4V", "*.AVI", "*.WMV", "*.MO", "*.QT", "*.FLV", "*.SWF", "*.AVCHD"
 
 #Default Paths
-$defaultSourceFolder = (New-Object -ComObject Shell.Application).NameSpace('shell:Downloads').Self.Path
-$defaultPicturesFolder = [environment]::getfolderpath("mypictures")
-$defaultProgramInstallersFolder = "D:\Program Installers\"
-$defaultDocumentsFolder = [environment]::getfolderpath("mydocuments")
-$defaultVideosFolder = [environment]::getfolderpath("myvideos")
+$DefaultSourceFolder = (New-Object -ComObject Shell.Application).NameSpace('shell:Downloads').Self.Path
+$DefaultPicturesFolder = [environment]::getfolderpath("mypictures")
+$DefaultInstallersFolder = "D:\Program Installers\"
+$DefaultDocumentsFolder = [environment]::getfolderpath("mydocuments")
+$DefaultVideosFolder = [environment]::getfolderpath("myvideos")
 
 #Aplication Folder Info
 $AppPath = "$Env:APPDATA\DCleaner"
 
-#Log File Info
-$LogName = "$AppPath\DCleaner-Log.log"
-
 #Custom Folder Location File Info
 $customFoldersName = "$AppPath\Custom-Folders.csv"
+
+
+
+New-ItemConditionalCreation -Item $AppPath -Type Directory
 
 #-----------------------------------------------------------[Functions]------------------------------------------------------------
 
@@ -113,11 +114,11 @@ function Start-FileSorting
 #Resets folder locations to default values
 function Set-DefaultLocations
 {
-    $txtDownloads.Text = $defaultSourceFolder
-    $txtPictures.Text = $defaultPicturesFolder
-    $txtProgramInstallers.Text = $defaultProgramInstallersFolder
-    $txtDocuments.Text = $defaultDocumentsFolder
-    $txtVideos.Text = $defaultVideosFolder
+    $txtDownloads.Text = $DefaultSourceFolder
+    $txtPictures.Text = $DefaultPicturesFolder
+    $txtProgramInstallers.Text = $DefaultInstallersFolder
+    $txtDocuments.Text = $DefaultDocumentsFolder
+    $txtVideos.Text = $DefaultVideosFolder
 }
 
 #Saves custom folder locations to local file
@@ -376,5 +377,3 @@ if((Test-Path $customFoldersName) -eq $false)
 {
     Set-DefaultLocations
 }
-
-New-ItemConditionalCreation -Item $AppPath -Type Directory
