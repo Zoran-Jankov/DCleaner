@@ -34,6 +34,112 @@ $installerExtensions = "*.exe", "*.msi", "*.msm", "*.msp", "*.mst", "*.idt", "*.
 $pictureExtensions = "*.JPG", "*.PNG", "*.GIF", "*.WEBP", "*.TIFF", "*.SD", "*.RAW", "*.BMP", "*.HEIF", "*.INDD", "*.JPEG", "*.SVG", "*.AI", "*.EPS", "*.PDF", "*.cvs"
 $videoExtensions = "*.WEBM", "*.MPG", "*.MP2", "*.MPEG", "*.MPE", "*.MPV", "*.OGG", "*.MP4", "*.M4P", "*.M4V", "*.AVI", "*.WMV", "*.MO", "*.QT", "*.FLV", "*.SWF", "*.AVCHD"
 
+#Default Paths
+$defaultSourceFolder = (New-Object -ComObject Shell.Application).NameSpace('shell:Downloads').Self.Path
+$defaultPicturesFolder = [environment]::getfolderpath("mypictures")
+$defaultProgramInstallersFolder = "D:\Program Installers\"
+$defaultDocumentsFolder = [environment]::getfolderpath("mydocuments")
+$defaultVideosFolder = [environment]::getfolderpath("myvideos")
+
+#Aplication Folder Info
+$AppPath = "$Env:APPDATA\DCleaner"
+
+#Log File Info
+$LogName = "$AppPath\DCleaner-Log.log"
+
+#Custom Folder Location File Info
+$customFoldersName = "$AppPath\Custom-Folders.csv"
+
+#-----------------------------------------------------------[Functions]------------------------------------------------------------
+
+Import-Module "$PSScriptRoot\Modules\New-ItemConditionalCreation.psm1"
+
+#Moves files with defined extensions from source folder to defined destination folder
+function Move-Files
+{
+    param([String]$Extensions, [String]$Source, [String]$Destination)
+
+    $massage = "Started moving files to " + $Destination
+    Write-Log -Message $massage
+
+    Try
+    {
+        foreach($extension in $Extensions)
+        {
+            $path = Join-Path -Path $Source -ChildPath $extension
+            $files = Get-ChildItem -Path $path
+
+            foreach($file in $files)
+            {
+                Move-Item -Path $file.FullName -Destination $Destination
+                $logEntry = $file.Name + " moved to " + $Destination
+                Write-Log -Message $logEntry
+            }
+        }
+    }
+
+    Catch
+    {
+        Write-Log -Message $_.Exception
+        Break
+    }
+
+    $massage = "Finished moving files to " + $Destination
+    Write-Log -Message $massage
+}
+
+#Starts files moving from source to user library folders
+function Start-FileSorting
+{
+    Write-Log -Message "File sorting started"
+
+    #Get Locations
+    $sourceFolder = $txtDownloads.Text
+    $documentsFolder = $txtDocuments.Text
+    $picturesFolder = $txtPictures.Text
+    $videosFolder = $txtVideos.Text
+    $programInstallersFolder = $txtProgramInstallers.Text
+
+    #Moves files from source to user library folders
+    Move-Files -Extensions $documentExtensions -Source $sourceFolder -Destination $documentsFolder
+    Move-Files -Extensions $pictureExtensions -Source $sourceFolder -Destination $picturesFolder
+    Move-Files -Extensions $videoExtensions -Source $sourceFolder -Destination $videosFolder
+    Move-Files -Extensions $installerExtensions -Source $sourceFolder -Destination $programInstallersFolder
+
+    Write-Log -Message "Completed Successfully."
+    Add-Content -Path $logFile -Value "==========================================================================================="
+}
+
+#Resets folder locations to default values
+function Set-DefaultLocations
+{
+    $txtDownloads.Text = $defaultSourceFolder
+    $txtPictures.Text = $defaultPicturesFolder
+    $txtProgramInstallers.Text = $defaultProgramInstallersFolder
+    $txtDocuments.Text = $defaultDocumentsFolder
+    $txtVideos.Text = $defaultVideosFolder
+}
+
+#Saves custom folder locations to local file
+function Save-FolderSettings
+{
+        #TODO Save paths
+}
+
+#Save folder path
+function Save-Path
+{
+    param ([string]$Name, [string]$Path)
+    
+    $xmlWriter.WriteStartElement($Name)
+
+    $xmlWriter.WriteElementString("Path",$Path)
+
+    $xmlWriter.WriteEndElement()
+}
+
+#-----------------------------------------------------------[Execution]------------------------------------------------------------
+
 #Create GUI
 Add-Type -AssemblyName System.Windows.Forms
 [System.Windows.Forms.Application]::EnableVisualStyles()
@@ -265,152 +371,10 @@ $AboutButton.Add_Click({
 
 [void]$DCleanerForm.ShowDialog()
 
-#----------------------------------------------------------[Declarations]----------------------------------------------------------
-
-#Default Paths
-$defaultSourceFolder = (New-Object -ComObject Shell.Application).NameSpace('shell:Downloads').Self.Path
-$defaultPicturesFolder = [environment]::getfolderpath("mypictures")
-$defaultProgramInstallersFolder = "D:\Program Installers\"
-$defaultDocumentsFolder = [environment]::getfolderpath("mydocuments")
-$defaultVideosFolder = [environment]::getfolderpath("myvideos")
-
-#Aplication Folder Info
-$appPath = $env:APPDATA + "\File Sorter"
-
-#Log File Info
-$logName = "File-Sorter-Log.txt"
-$logFile = Join-Path -Path $appPath -ChildPath $logName
-
-#Custom Folder Location File Info
-$customFoldersName = "Custom-Folders.xml"
-$customFoldersFile = Join-Path -Path $appPath -ChildPath $customFoldersName
-
-#-----------------------------------------------------------[Functions]------------------------------------------------------------
-
-Import-Module "$PSScriptRoot\Modules\New-ItemConditionalCreation.psm1"
-
-#Moves files with defined extensions from source folder to defined destination folder
-function Move-Files
-{
-    param([String]$Extensions, [String]$Source, [String]$Destination)
-
-    $massage = "Started moving files to " + $Destination
-    Write-Log -Message $massage
-
-    Try
-    {
-        foreach($extension in $Extensions)
-        {
-            $path = Join-Path -Path $Source -ChildPath $extension
-            $files = Get-ChildItem -Path $path
-
-            foreach($file in $files)
-            {
-                Move-Item -Path $file.FullName -Destination $Destination
-                $logEntry = $file.Name + " moved to " + $Destination
-                Write-Log -Message $logEntry
-            }
-        }
-    }
-
-    Catch
-    {
-        Write-Log -Message $_.Exception
-        Break
-    }
-
-    $massage = "Finished moving files to " + $Destination
-    Write-Log -Message $massage
-}
-
-#Starts files moving from source to user library folders
-function Start-FileSorting
-{
-    Write-Log -Message "File sorting started"
-
-    #Get Locations
-    $sourceFolder = $txtDownloads.Text
-    $documentsFolder = $txtDocuments.Text
-    $picturesFolder = $txtPictures.Text
-    $videosFolder = $txtVideos.Text
-    $programInstallersFolder = $txtProgramInstallers.Text
-
-    #Moves files from source to user library folders
-    Move-Files -Extensions $documentExtensions -Source $sourceFolder -Destination $documentsFolder
-    Move-Files -Extensions $pictureExtensions -Source $sourceFolder -Destination $picturesFolder
-    Move-Files -Extensions $videoExtensions -Source $sourceFolder -Destination $videosFolder
-    Move-Files -Extensions $installerExtensions -Source $sourceFolder -Destination $programInstallersFolder
-
-    Write-Log -Message "Completed Successfully."
-    Add-Content -Path $logFile -Value "==========================================================================================="
-}
-
-#Resets folder locations to default values
-function Set-DefaultLocations
-{
-    $txtDownloads.Text = $defaultSourceFolder
-    $txtPictures.Text = $defaultPicturesFolder
-    $txtProgramInstallers.Text = $defaultProgramInstallersFolder
-    $txtDocuments.Text = $defaultDocumentsFolder
-    $txtVideos.Text = $defaultVideosFolder
-}
-
-#Saves custom folder locations to local file
-function Save-FolderSettings
-{
-    if((Test-Path -Path $customFoldersFile) -eq $false)
-    {
-        #Set The Formatting
-        $xmlsettings = New-Object System.Xml.XmlWriterSettings
-        $xmlsettings.Indent = $true
-        $xmlsettings.IndentChars = "    "
-
-        #Set the File Name Create The Document
-        $XmlWriter = [System.XML.XmlWriter]::Create($customFoldersFile, $xmlsettings)
-
-        #Write the XML Decleration and set the XSL
-        $xmlWriter.WriteStartDocument()
-        $xmlWriter.WriteProcessingInstruction("xml-stylesheet", "type='text/xsl' href='style.xsl'")
-
-        #Start the Root Element
-        $xmlWriter.WriteStartElement("Root")
-
-        Save-Path -Name "Source" -Path $txtDownloads.Text
-        Save-Path -Name "Documents" -Path $txtDocuments.Text
-        Save-Path -Name "Pictures" -Path $txtPictures.Text
-        Save-Path -Name "Videos" -Path $txtVideos.Text
-        Save-Path -Name "ProgramInstallers" -Path $txtProgramInstallers.Text
-
-        $xmlWriter.WriteEndElement()
-
-        #End, Finalize and close the XML Document
-        $xmlWriter.WriteEndDocument()
-        $xmlWriter.Flush()
-        $xmlWriter.Close()
-    }
-
-    #TODO Update saved paths
-}
-
-#Save folder path
-function Save-Path
-{
-    param ([string]$Name, [string]$Path)
-    
-    $xmlWriter.WriteStartElement($Name)
-
-    $xmlWriter.WriteElementString("Path",$Path)
-
-    $xmlWriter.WriteEndElement()
-}
-
-#-----------------------------------------------------------[Execution]------------------------------------------------------------
-
 #Load Locations Folders
 if((Test-Path $customFoldersName) -eq $false)
 {
     Set-DefaultLocations
 }
 
-New-ItemConditionalCreation -Item $appPath -Type Directory
-New-ItemConditionalCreation -Item $logFile -Type File
+New-ItemConditionalCreation -Item $AppPath -Type Directory
