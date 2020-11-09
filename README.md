@@ -1,4 +1,4 @@
-# File-Sorter
+# DCleaner
 
 [![made-with-powershell](https://img.shields.io/badge/PowerShell-1f425f?logo=Powershell)](https://microsoft.com/PowerShell)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
@@ -9,7 +9,7 @@
 
 This application moves files from the source folder to user libraries. In the source folder all files are checked and moved to Videos, Pictures, Documents and Program Installers folders based on file extensions. Paths to target folder and to user libraries can be defined by the user, and saved permanently to local computer, but there are default values for those paths. File sorting is not performed in subfolders of the target folder and they are not moved by the script.
 
-![](https://github.com/Zoran-Jankov/File-Sorter/blob/master/File%20Sorter.png)
+![Application](https://github.com/Zoran-Jankov/DCleaner/blob/master/DCleaner.png)
 
 ## Credits
 
