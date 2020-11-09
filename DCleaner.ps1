@@ -259,7 +259,9 @@ $InstallersFolderButton.Add_Click({  })
 $DefaultLocationsButton.Add_Click({  })
 $CleanButton.Add_Click({  })
 $SaveLocationsButton.Add_Click({  })
-$AboutButton.Add_Click({  })
+$AboutButton.Add_Click({
+    Start-Process https://github.com/Zoran-Jankov/DCleaner/blob/master/README.md
+  })
 
 [void]$DCleanerForm.ShowDialog()
 
