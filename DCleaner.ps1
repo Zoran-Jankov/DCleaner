@@ -28,6 +28,9 @@ Author:         Zoran Jankov
 #Set Error Action to Silently Continue
 $ErrorActionPreference = "SilentlyContinue"
 
+#Load application setting
+$Settings = Get-Content "$PSScriptRoot\Settings.cfg" | ConvertFrom-StringData
+
 #Set known extensions
 $documentExtensions = "*.DOC", "*.DOCX", "*.HTML", "*.HTM", "*.ODT", "*.PDF", "*.XLS", "*.XLSX", "*.ODS", "*.PPT", "*.PPTX", "*.TXT", "*.LOG"
 $installerExtensions = "*.exe", "*.msi", "*.msm", "*.msp", "*.mst", "*.idt", "*.idt", "*.cub", "*.pcp", "*.jar"
@@ -35,21 +38,19 @@ $pictureExtensions = "*.JPG", "*.PNG", "*.GIF", "*.WEBP", "*.TIFF", "*.SD", "*.R
 $videoExtensions = "*.WEBM", "*.MPG", "*.MP2", "*.MPEG", "*.MPE", "*.MPV", "*.OGG", "*.MP4", "*.M4P", "*.M4V", "*.AVI", "*.WMV", "*.MO", "*.QT", "*.FLV", "*.SWF", "*.AVCHD"
 
 #Default Paths
-$DefaultSourceFolder = (New-Object -ComObject Shell.Application).NameSpace('shell:Downloads').Self.Path
-$DefaultPicturesFolder = [environment]::getfolderpath("mypictures")
-$DefaultInstallersFolder = "D:\Program Installers\"
+$DefaultDownloadsFolder = (New-Object -ComObject Shell.Application).NameSpace('shell:Downloads').Self.Path
 $DefaultDocumentsFolder = [environment]::getfolderpath("mydocuments")
+$DefaultMusicLocation = [environment]::getfolderpath("mymusic")
+$DefaultPicturesFolder = [environment]::getfolderpath("mypictures")
 $DefaultVideosFolder = [environment]::getfolderpath("myvideos")
+$DefaultInstallersFolder = "D:\Installers\"
 
-#Aplication Folder Info
-$AppPath = "$Env:APPDATA\DCleaner"
-
-#Custom Folder Location File Info
-$customFoldersName = "$AppPath\Custom-Folders.csv"
-
-
-
-New-ItemConditionalCreation -Item $AppPath -Type Directory
+#Create aplication temp folder
+if (-not (Test-Path -Path $Settings.AppFolder)) {
+    New-Item -Path $Settings.AppFolder -ItemType Directory
+    $Message = "Successfully created " + $Settings.AppFolder + " folder"
+    Write-Log -Message $Message
+}
 
 #-----------------------------------------------------------[Functions]------------------------------------------------------------
 
@@ -112,13 +113,19 @@ function Start-FileSorting
 }
 
 #Resets folder locations to default values
-function Set-DefaultLocations
+function Set-FolderLocations
 {
-    $txtDownloads.Text = $DefaultSourceFolder
-    $txtPictures.Text = $DefaultPicturesFolder
-    $txtProgramInstallers.Text = $DefaultInstallersFolder
-    $txtDocuments.Text = $DefaultDocumentsFolder
-    $txtVideos.Text = $DefaultVideosFolder
+    if (Test-Path -Path $Settings.CustomFolders) {
+        Default
+    }
+    else {
+        $txtDownloads.Text = $DefaultDownloadsFolder
+        $txtPictures.Text = $DefaultPicturesFolder
+        $txtProgramInstallers.Text = $DefaultInstallersFolder
+        $txtDocuments.Text = $DefaultDocumentsFolder
+        $txtVideos.Text = $DefaultVideosFolder
+    }
+    
 }
 
 #Saves custom folder locations to local file
@@ -352,8 +359,8 @@ $DCleanerForm.controls.AddRange(@($SourceFolderLabel,
                                   $InstallersFolderLabel,
                                   $InstallersFolderTextBox,
                                   $InstallersFolderButton,
-                                  $CleanButton,
                                   $DefaultLocationsButton,
+                                  $CleanButton,
                                   $SaveLocationsButton,
                                   $AboutButton))
 
@@ -368,12 +375,9 @@ $CleanButton.Add_Click({  })
 $SaveLocationsButton.Add_Click({  })
 $AboutButton.Add_Click({
     Start-Process https://github.com/Zoran-Jankov/DCleaner/blob/master/README.md
-  })
+})
 
 [void]$DCleanerForm.ShowDialog()
 
-#Load Locations Folders
-if((Test-Path $customFoldersName) -eq $false)
-{
-    Set-DefaultLocations
-}
+#Load Folders Locations
+Set-FolderLocations
